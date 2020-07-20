@@ -1,0 +1,34 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        - "FLASK_ENV=${FLASK_ENV:-development}"
+#    container_name: "c_dados:latest"
+#    environment:
+#      FLASK_ENV: development
+    ports:
+      - "5159:5000"
+#    depends_on:
+#      - db
+#    volumes:
+#      - ./src:/home/usuarioapp/src
+    networks:
+      - redcontenedores_fr
+
+#  db:
+#    container_name: "mongodb"
+#    image: mongo
+#    networks:
+#      - back
+
+
+networks:
+  redcontenedores_fr:
+    driver: bridge
+#  redcontenedores_bk:
+#    driver: bridge
+
