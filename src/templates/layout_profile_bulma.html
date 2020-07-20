@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" class=" has-aside-mobile-transition has-navbar-fixed-top ">
+    <!-- has-aside-left has-aside-expanded -->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block head %}{% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+
+
+    {% block styles %}
+        <!-- Favicon-->
+        <link rel="icon" href="{{ url_for("static", filename="images/favicon.ico") }}">
+
+        <!-- RESET CSS -->
+        <link rel="stylesheet" href="{{ url_for("static", filename="css/reset.css") }}">
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="{{ url_for("static", filename="css/custom.css") }}">
+        <!-- FONTS -->
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+
+    {% endblock %}    
+    
+    
+</head>
+
+<body >
+    <div id="app" >
+        <!-- HEADER -->
+        <header>
+            {% block header %}{% endblock %}
+        </header>
+        
+        <!-- MAIN -->
+        <main>
+            {% block main %}{% endblock %}
+        </main>
+        
+        <!-- FOOTER  -->
+        <footer>
+            {% block footer %}{% endblock %}
+        </footer>
+    </div>
+    {% block scripts %}
+        <!-- CUSTOM JS -->
+        <script type="text/javascript" src="{{ url_for("static", filename="js/main.js") }}"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+{#        <script type="text/javascript" src="{{ url_for("static", filename="js/chart.sample.js") }}"></script>#}
+
+    {% endblock %}
+</body>
+
+</html>

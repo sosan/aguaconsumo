@@ -1,0 +1,54 @@
+<nav id="navbar-main" class="navbar is-fixed-top">
+    <div class="navbar-brand">
+
+        <div class="navbar-item">
+            <section class="section is-title-bar">
+                <ul>
+                    <li>{{ titulo }}</li>
+                {% if session["nombre"] %}
+                    <li>{{ session["nombre"] }}</li>
+                {% else %}
+                    <li>NaN</li>
+                {% endif %}
+                </ul>
+            </section>
+        </div>
+    </div>
+    <div class="navbar-brand is-right">
+        <a class="navbar-item is-hidden-desktop jb-navbar-menu-toggle" data-target="navbar-menu">
+            <span class="icon"><i class="mdi mdi-dots-vertical mdi-34px"></i></span>
+        </a>
+    </div>
+    <div class="navbar-menu fadeIn animated faster" id="navbar-menu">
+        <div class="navbar-end">
+            <div class="navbar-item has-dropdown has-dropdown-with-icons has-divider is-hoverable">
+                <a class="navbar-link is-arrowless">
+                    <span class="icon"><i class="mdi mdi-menu"></i></span>
+                    <span>Menu</span>
+                    <span class="icon">
+                        <i class="mdi mdi-chevron-down"></i>
+                    </span>
+                </a>
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="{{ url_for("profile") }}">
+                        <span class="icon"><i class="mdi mdi-account"></i></span>
+                        <span>Mi Perfil</span>
+                    </a>
+                    <a class="navbar-item" href="#">
+                        <span class="icon"><i class="mdi mdi-settings"></i></span>
+                        <span>Configuracion</span>
+                    </a>
+                    <a class="navbar-item" href="#">
+                        <span class="icon"><i class="mdi mdi-email"></i></span>
+                        <span>Alertas</span>
+                    </a>
+                    <hr class="navbar-divider">
+                    <a class="navbar-item" href="{{ url_for("desconexion_perfil") }}">
+                        <span class="icon"><i class="mdi mdi-logout"></i></span>
+                        <span>Desconexion</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

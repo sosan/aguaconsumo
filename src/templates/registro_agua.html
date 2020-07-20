@@ -1,0 +1,122 @@
+{% extends "layout_profile_bulma.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+{% endblock %}
+
+
+{% block header %}
+    {% include "menu_navbar.html" %}
+
+{% endblock %}
+
+
+
+{% block main %}
+<section class="section is-main-section">
+
+    <h1>Ingresar Agua Bebida</h1><br><br><br>
+    <div>
+        <div class="field">
+            {% if errores %}
+                <h3 class="">{{ errores }}</h3><br><br>
+            {% endif %}
+
+            <form action={{ url_for("introduciragua_post") }} method="POST">
+                <input type="date" name="fecha" id="fecha" value="{{ fecha_actual.strftime("%Y-%m-%d") }}" required><br><br>
+                Concepto
+                <select name="concepto" id="concepto">
+                    {% for i in range(0, listado_conceptos|length) %}
+                        <option value="{{ listado_conceptos[i] }}">{{ listado_conceptos[i] }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="button modal-button" data-target="#vermodal" aria-haspopup="true">Añadir Conceptos</button>
+                <button type="button" class="button modal-button" data-target="#ver_renombrar" aria-haspopup="true">Renombrar Conceptos</button>
+                <br>
+
+                Valor: <input class="input is-medium" type="number" min="0" step="any" value="" name="valor" id="valor" />
+                <div class="control">
+                    <button class="button is-primary is-mobile" type="submit">INSERTAR DATO</button>
+                </div>
+            </form>
+            <a href="{{ url_for("profile") }}">
+                <button type="button" class="button-atras">Atras</button>
+            </a>
+        </div>
+        <h3>{{ mensaje }}</h3>
+    </div>
+
+    <div class="modal " id="vermodal">
+        <form action="{{ url_for("nuevo_concepto_post") }}" method="post">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Nuevo Concepto</p>
+                    <button class="delete" aria-label="close" type="button"></button>
+                </header>
+                <section class="modal-card-body">
+                    Concepto
+                    <input type="text" name="txt_concepto" value="">
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" type="submit">Insertar Nuevo Concepto</button>
+                    <button class="button close" aria-label="close" type="button">Cancelar</button>
+                </footer>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal " id="ver_renombrar">
+        <form action="{{ url_for("renombrar_concepto") }}" method="post">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Renombrar Concepto</p>
+                    <button class="delete" aria-label="close" type="button"></button>
+                </header>
+                <section class="modal-card-body">
+                    <select name="concepto" id="concepto">
+                        {% for i in range(0, listado_conceptos|length) %}
+                        <option value="{{ listado_conceptos[i] }}">{{ listado_conceptos[i] }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br>Renombrar
+                    <input type="text" name="txt_renombrar_concepto" value="">
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" type="submit">Renombrar Concepto</button>
+                    <button class="button close" aria-label="close" type="button">Cancelar</button>
+                </footer>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.querySelectorAll('.modal-button').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var target = document.querySelector(el.getAttribute('data-target'));
+
+            target.classList.add('is-active');
+
+            target.querySelector('.close').addEventListener('click', function () {
+                target.classList.remove('is-active');
+            });
+
+            target.querySelector('.delete').addEventListener('click', function () {
+                target.classList.remove('is-active');
+            });
+
+        });
+    });
+</script>
+{% endblock %}
