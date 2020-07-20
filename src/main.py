@@ -37,7 +37,6 @@ def home():
 @app.route("/", methods=["post"])
 def recibir_login():
     if "usuario" and "password" in request.form:
-
         ok = managerlogica.comprobar_existencia_usuario_db(
             request.form["usuario"], request.form["password"])
         if ok == True:
@@ -49,7 +48,6 @@ def recibir_login():
             session["password"] = request.form["password"]
             if "nombre" in datosusuario:
                 session["nombre"] = datosusuario["nombre"]
-
             return redirect(url_for("profile"))
 
     return redirect(url_for("home"))
@@ -61,10 +59,10 @@ def profile():
     if redirection == True:
         return redirect(url_for("home"))
 
-    listado_datos, datos_informes, delta_date, num_limite_datos = managerlogica.getlastdays(
+    listado_datos, datos_informes, delta_date, num_limite_datos, labels = managerlogica.getlastdays(
         session["usuario"], 6)
 
-    return render_template("profile.html", informes=datos_informes, datos=listado_datos,
+    return render_template("profile.html", informes=datos_informes, datos=listado_datos, labels=labels,
                            fecha_actual=datetime.utcnow(), fecha_delta=delta_date,
                            num_limite_datos=num_limite_datos, titulo="Entrada")
 
@@ -166,7 +164,7 @@ def registro_usuario_get():
 @app.route("/registro", methods=["post"])
 def registro_usuario_post():
     if "usuario" and "password" and "nombre" in request.form:
-        datos_correctos, existe_usuario = managerlogica.comprobarusuario(
+        datos_correctos, existe_usuario = managerlogica.comprobar_existencia_usuario(
             request.form["usuario"],
             request.form["password"],
             request.form["nombre"]
@@ -261,7 +259,8 @@ def check_usuario_password():
             session.clear()
             redirect = True
             return redirect
-        return redirect
+        else:
+            return redirect
     else:
         redirect = True
         return redirect

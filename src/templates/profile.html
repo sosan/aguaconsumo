@@ -99,7 +99,11 @@
         <header class="card-header">
             <p class="card-header-title">
                 <span class="icon"><i class="mdi mdi-finance"></i></span>
+            {% if num_limite_datos > 0 %}
                 Ultimos {{ num_limite_datos }} datos
+            {% else %}
+                Sin datos
+            {% endif %}
             </p>
         </header>
         <div class="card-content">
@@ -115,7 +119,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    {% if informes != None %}
+                    {% if num_limite_datos > 0 %}
                         {% for i in range(0, num_limite_datos) %}
                             <tr>
                                 <td class="is-image-cell">
@@ -130,13 +134,8 @@
                                         {{ informes[i].fecha.strftime("%d-%m-%Y") }}
                                 </td>
                             </tr>
-
                         {% endfor %}
                     {% endif %}
-
-
-
-
                     </tbody>
                 </table>
             </div>
@@ -156,61 +155,121 @@
 <script>
 
 const createDataSets = function createDataSets(n) {
-    let listadodatos = [];
-    let datajson = {{ datos|tojson }};
-    for (let i = 0; i < n; i++)
+
+    if (n > 0)
     {
-        let valores = []
-        for (let o = 0; o < datajson[i].length; o++ )
+        let listadodatos = [];
+        let datajson = {{ datos|tojson }};
+        for (let i = 0; i < n; i++)
         {
-            valores.push(datajson[i][o][1])
+            let valores = []
+            for (let o = 0; o < datajson[i].length; o++ )
+            {
+                valores.push(datajson[i][o][1])
+            }
+
+            const randomColor = getRandomColor();
+
+            listadodatos.push(
+            {
+                fill: false,
+                borderColor: randomColor,
+                borderWidth: 2,
+                borderDash: [],
+                borderDashOffset: 0.0,
+                pointBackgroundColor: randomColor,
+                pointBorderColor: 'rgba(255,255,255,0)',
+                pointHoverBackgroundColor: randomColor,
+                pointBorderWidth: 20,
+                pointHoverRadius: 4,
+                pointHoverBorderWidth: 15,
+                pointRadius: 4,
+                data: valores
+            })
         }
 
-        const randomColor = getRandomColor();
+        return listadodatos;
 
-        listadodatos.push(
+    }
+    else
+    {
+        let listadodatos = [];
+
+        for (let i = 0; i < 7; i++)
         {
-            fill: false,
-            borderColor: randomColor,
-            borderWidth: 2,
-            borderDash: [],
-            borderDashOffset: 0.0,
-            pointBackgroundColor: randomColor,
-            pointBorderColor: 'rgba(255,255,255,0)',
-            pointHoverBackgroundColor: randomColor,
-            pointBorderWidth: 20,
-            pointHoverRadius: 4,
-            pointHoverBorderWidth: 15,
-            pointRadius: 4,
-            data: valores
-        })
+            const randomColor = getRandomColor();
+            listadodatos.push(
+            {
+                fill: false,
+                borderColor: randomColor,
+                borderWidth: 2,
+                borderDash: [],
+                borderDashOffset: 0.0,
+                pointBackgroundColor: randomColor,
+                pointBorderColor: 'rgba(255,255,255,0)',
+                pointHoverBackgroundColor: randomColor,
+                pointBorderWidth: 20,
+                pointHoverRadius: 4,
+                pointHoverBorderWidth: 15,
+                pointRadius: 4,
+                data: [0]
+            })
+        }
+
+
+        return listadodatos;
+
+
+
     }
 
-    return listadodatos;
 
 };
 
 const createLabels = function createLabels(n) {
 
-    moment().format();
-    const labels = new Set();
-    let datajson = {{ datos|tojson }};
-    for (let i = 0; i < n; i++)
+    if (n > 0)
     {
-        for (let o = 0; o < datajson[i].length; o++ )
+        moment().format();
+        const datalabels = new Set();
+        let datajson = {{ datos|tojson }};
+        for (let i = 0; i < n; i++)
         {
-            let current_item = moment.utc(datajson[i][o][0]).format("DD MM")
-            labels.add(current_item)
+            for (let o = 0; o < datajson[i].length; o++ )
+            {
+                let current_item = moment.utc(datajson[i][o][0]).format("DD MM")
+                datalabels.add(current_item)
+
+            }
 
         }
 
+        console.log(datalabels)
+        const labelsSorted  = [...datalabels].sort(comparar)
+        console.log(labelsSorted)
+
+        return labelsSorted;
+
+
+    }
+    else
+    {
+        moment().format();
+        const datalabels = new Set();
+        const data = {{ labels|tojson }};
+
+        for (let o = 0; o < data.length; o++ )
+        {
+            let current_item = moment.utc(data[o]).format("DD MM")
+            datalabels.add(current_item);
+        }
+
+        const sortedata  = [...datalabels].sort(comparar)
+        return sortedata;
+
     }
 
-    console.log(labels)
-    const labelsSorted  = [...labels].sort(comparar)
-    console.log(labelsSorted)
 
-    return labelsSorted;
 
 };
 
@@ -240,7 +299,7 @@ new Chart(ctx, {
   type: 'line',
   data: {
     datasets: createDataSets({{ datos|length }}),
-    labels: createLabels({{ datos|length }})
+    labels:  createLabels({{ datos|length }})
   },
   options: {
     maintainAspectRatio: false,

@@ -41,6 +41,22 @@ class ManagerLogica():
         existe_usuario = self.managermongo.comprobarusuario(usuario, password)
         return datos_correctos, existe_usuario
 
+    def comprobar_existencia_usuario(self, usuario, password, nombre):
+        # metodo donde comprobamos si los datos del usuario son correctos y si existe el usuario
+        # devuelve una tupla de bools
+        datos_correctos = False
+        existe_usuario = False
+
+        if (len(usuario) > 12):
+            return datos_correctos, existe_usuario
+
+        datos_correctos = self.comprobar_datos_usuario(usuario, password, nombre)
+        if (datos_correctos == False):
+            return datos_correctos, existe_usuario
+
+        existe_usuario = self.managermongo.comprobar_existencia_usuario(usuario)
+        return datos_correctos, existe_usuario
+
     def comprobar_datos_usuario(self, usuario, password, nombre):
         # metodo donde comprueba los datos introducidos tienen algun
         # error.
@@ -109,11 +125,6 @@ class ManagerLogica():
     def getlastdays(self, usuario, cantidad_dias):
         end_date = datetime.utcnow()
         delta_date = end_date - timedelta(days=cantidad_dias)
-
-        # labels = []
-        # for o in range(delta_date.day, end_date.day + 1):
-        #     labels.append("{}".format(o))
-
         datos_raw = self.managermongo.getinforme(usuario, delta_date, end_date)
         listado_conceptos = self.getlistado_conceptos(usuario)
 
@@ -121,11 +132,12 @@ class ManagerLogica():
         if len(datos_raw) < 10:
             num_limite_datos = len(datos_raw)
 
-        listado_datos, datos_procesados = self.procesar_datoschart(datos_raw, listado_conceptos)
+        listado_datos, datos_procesados, labels = self.procesar_datoschart(datos_raw, listado_conceptos, end_date,
+                                                                           delta_date)
 
-        return listado_datos, datos_procesados, delta_date, num_limite_datos
+        return listado_datos, datos_procesados, delta_date, num_limite_datos, labels
 
-    def procesar_datoschart(self, datos, listado_conceptos):
+    def procesar_datoschart(self, datos, listado_conceptos, end_date, delta_date):
         """
         _id: 5f0e0c67a130ea8176834961
         usuario: "h@h.com"
@@ -136,6 +148,8 @@ class ManagerLogica():
         """
         datos_procesados = []
         listado_datos = []
+        labels = []
+
         for o in range(0, len(listado_conceptos)):
             templist = []
             for i in range(0, len(datos)):
@@ -148,15 +162,18 @@ class ManagerLogica():
                     for x in range(0, len(datos)):
                         if datos[x]["concepto"] == listado_conceptos[o]:
                             # todo: si no es igual continue
-                            if ((datos[i]["fecha"].day == datos[x]["fecha"].day) and (datos[i]["fecha"].month ==  datos[x]["fecha"].month)):
+                            if ((datos[i]["fecha"].day == datos[x]["fecha"].day) and (
+                                    datos[i]["fecha"].month == datos[x]["fecha"].month)):
                                 acumulado_valor = acumulado_valor + datos[x]["valor"]
                     if len(templist) > 0:
-                        if (templist[-1][0].day != datos[i]["fecha"].day) and (templist[-1][0].month != datos[i]["fecha"].month):
+                        if (templist[-1][0].day != datos[i]["fecha"].day) and (
+                                templist[-1][0].month != datos[i]["fecha"].month):
                             if acumulado_valor != 0:
                                 templist.append([datos[i]["fecha"], acumulado_valor])
                             else:
                                 templist.append([datos[i]["fecha"], datos[i]["valor"]])
-                        if (templist[-1][0].day != datos[i]["fecha"].day) and (templist[-1][0].month == datos[i]["fecha"].month):
+                        if (templist[-1][0].day != datos[i]["fecha"].day) and (
+                                templist[-1][0].month == datos[i]["fecha"].month):
                             if acumulado_valor != 0:
                                 templist.append([datos[i]["fecha"], acumulado_valor])
                             else:
@@ -169,7 +186,12 @@ class ManagerLogica():
             if len(templist) > 0:
                 listado_datos.append(templist)
 
-        return listado_datos, datos_procesados
+        if len(listado_datos) <= 0:
+            for o in range(0, 7):
+                fecha = delta_date + timedelta(days=o)
+                labels.append(fecha)
+
+        return listado_datos, datos_procesados, labels
 
     def insertar_nuevo_concepto(self, usuario, concepto):
         resultado = self.managermongo.insertar_nuevo_concepto(usuario, concepto)

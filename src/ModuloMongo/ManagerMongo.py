@@ -53,6 +53,17 @@ class ManagerMongo:
         except ConnectionFailure:
             raise Exception("Servidor no disponible")
 
+    def comprobar_existencia_usuario(self, usuario):
+        try:
+            resultado = self.coleccion_admin.find_one(
+                {"usuario": usuario})
+            if resultado != None:
+                if len(resultado) > 0:
+                    return True
+            return False
+        except ConnectionFailure:
+            raise Exception("Servidor no disponible")
+
     def get_data_usuario(self, usuario, password):
         try:
             datos = self.coleccion_admin.find_one(
